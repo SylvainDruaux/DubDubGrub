@@ -23,6 +23,7 @@
 		E49436A62B6FD42500558A18 /* MapBalloon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49436A52B6FD42500558A18 /* MapBalloon.swift */; };
 		E49436A82B6FD8A000558A18 /* DDGAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49436A72B6FD8A000558A18 /* DDGAnnotation.swift */; };
 		E49436AB2B70112E00558A18 /* AppTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49436AA2B70112E00558A18 /* AppTabViewModel.swift */; };
+		E49576E82B7288C5001E7E42 /* ProfileSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49576E72B7288C5001E7E42 /* ProfileSheetView.swift */; };
 		E49924612B69217F0040FAB6 /* LocationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49924602B69217F0040FAB6 /* LocationCell.swift */; };
 		E49924632B6921A60040FAB6 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49924622B6921A60040FAB6 /* AvatarView.swift */; };
 		E49924652B6924230040FAB6 /* CustomModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49924642B6924230040FAB6 /* CustomModifiers.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E41B9C072B7139F00023B45D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E42B4FA92B682A58003E6475 /* DubDubGrub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DubDubGrub.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E42B4FAC2B682A58003E6475 /* DubDubGrubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DubDubGrubApp.swift; sourceTree = "<group>"; };
 		E42B4FB02B682A5A003E6475 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 		E49436A52B6FD42500558A18 /* MapBalloon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapBalloon.swift; sourceTree = "<group>"; };
 		E49436A72B6FD8A000558A18 /* DDGAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDGAnnotation.swift; sourceTree = "<group>"; };
 		E49436AA2B70112E00558A18 /* AppTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabViewModel.swift; sourceTree = "<group>"; };
+		E49576E72B7288C5001E7E42 /* ProfileSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSheetView.swift; sourceTree = "<group>"; };
 		E49924602B69217F0040FAB6 /* LocationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCell.swift; sourceTree = "<group>"; };
 		E49924622B6921A60040FAB6 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		E49924642B6924230040FAB6 /* CustomModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomModifiers.swift; sourceTree = "<group>"; };
@@ -121,6 +124,7 @@
 				E42B4FD62B682AD7003E6475 /* DubDubGrub.entitlements */,
 				E42B4FAC2B682A58003E6475 /* DubDubGrubApp.swift */,
 				E42B4FB02B682A5A003E6475 /* Assets.xcassets */,
+				E41B9C072B7139F00023B45D /* Info.plist */,
 				E42B4FB22B682A5A003E6475 /* Preview Content */,
 			);
 			path = DubDubGrub;
@@ -149,6 +153,7 @@
 				E467C4F82B6D63AD009BEE7C /* LocationDetailViewModel.swift */,
 				E42B4FE12B683786003E6475 /* LocationDetailView.swift */,
 				E49F020A2B6E68730004CCB1 /* ProfileModalView.swift */,
+				E49576E72B7288C5001E7E42 /* ProfileSheetView.swift */,
 			);
 			path = LocationDetailView;
 			sourceTree = "<group>";
@@ -377,6 +382,7 @@
 			files = (
 				E42B4FAD2B682A58003E6475 /* DubDubGrubApp.swift in Sources */,
 				E499247A2B696B620040FAB6 /* Constants.swift in Sources */,
+				E49576E82B7288C5001E7E42 /* ProfileSheetView.swift in Sources */,
 				E4FFCB3A2B6A4CBA0043E787 /* CKAsset+Ext.swift in Sources */,
 				E467C4F42B6BE576009BEE7C /* ProfileViewModel.swift in Sources */,
 				E49924652B6924230040FAB6 /* CustomModifiers.swift in Sources */,
@@ -546,10 +552,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DubDubGrub/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Dub Dub Grub uses your location to show you where you are in relation to your friends and food.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -578,10 +584,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DubDubGrub/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Dub Dub Grub uses your location to show you where you are in relation to your friends and food.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (

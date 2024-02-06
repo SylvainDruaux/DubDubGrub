@@ -12,7 +12,33 @@ extension View {
         modifier(ProfileNameText())
     }
 
+    func playHaptic() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+    }
+
+    func embedInScrollView() -> some View {
+        GeometryReader { geometry in
+            ScrollView {
+                self.frame(minHeight: geometry.size.height, maxHeight: .infinity)
+            }
+        }
+    }
+
     func dismissKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    func determineColumns(for sizeCategory: ContentSizeCategory) -> [GridItem] {
+        let numberOfColumns = sizeCategory >= .accessibilityMedium ? 1 : 3
+        return Array(repeating: GridItem(.flexible()), count: numberOfColumns)
+    }
+
+    @ViewBuilder func createLocationDetailView(for location: DDGLocation, in sizeCategory: ContentSizeCategory) -> some View {
+        if sizeCategory >= .accessibilityMedium {
+            LocationDetailView(viewModel: LocationDetailViewModel(location: location)).embedInScrollView()
+        } else {
+            LocationDetailView(viewModel: LocationDetailViewModel(location: location))
+        }
     }
 }

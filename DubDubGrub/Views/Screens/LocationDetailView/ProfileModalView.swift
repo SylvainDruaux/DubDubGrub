@@ -26,11 +26,13 @@ struct ProfileModalView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
                     .foregroundColor(.secondary)
+                    .accessibilityLabel("Works at \(profile.companyName)")
 
                 Text(profile.bio)
                     .lineLimit(3)
                     .minimumScaleFactor(0.75)
                     .padding()
+                    .accessibilityLabel("Bio, \(profile.bio)")
             }
             .frame(width: 300, height: 230)
             .background(Color(.secondarySystemBackground))
@@ -46,6 +48,7 @@ struct ProfileModalView: View {
             AvatarView(image: profile.avatarImage, size: 110)
                 .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 6)
                 .offset(y: -120)
+                .accessibilityHidden(true)
         }
     }
 }

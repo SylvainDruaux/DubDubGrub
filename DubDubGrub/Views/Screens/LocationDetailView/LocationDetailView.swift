@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LocationDetailView: View {
     @ObservedObject var viewModel: LocationDetailViewModel
+    @Environment(\.sizeCategory) var sizeCategory
 
     var body: some View {
         ZStack {
@@ -34,25 +35,31 @@ struct LocationDetailView: View {
                         } label: {
                             LocationActionButton(color: .brandPrimary, image: "location.fill")
                         }
+                        .accessibilityLabel("Get directions.")
 
                         Link(destination: URL(string: viewModel.location.websiteURL)!) {
                             LocationActionButton(color: .brandPrimary, image: "network")
                         }
+                        .accessibilityRemoveTraits(.isButton)
+                        .accessibilityLabel("Go to website.")
 
                         Button {
                             viewModel.callLocation()
                         } label: {
                             LocationActionButton(color: .brandPrimary, image: "phone.fill")
                         }
+                        .accessibilityLabel("Call location.")
 
                         if CloudKitManager.shared.profileRecordID != nil {
                             Button {
                                 viewModel.updateCheckInStatus(to: viewModel.isCheckedIn ? .checkedOut : .checkedIn)
+                                playHaptic()
                             } label: {
                                 LocationActionButton(
                                     color: viewModel.isCheckedIn ? .pink : .brandPrimary,
                                     image: viewModel.isCheckedIn ? "person.fill.xmark" : "person.fill.checkmark"
                                 )
+                                .accessibilityLabel(viewModel.isCheckedIn ? "Check out of location." : "Check into location.")
                             }
                         }
                     }
@@ -61,6 +68,9 @@ struct LocationDetailView: View {
 
                 Text("Who's Here?")
                     .font(.title2).bold()
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityLabel("How's here? \(viewModel.checkedInProfiles.count) checked in")
+                    .accessibilityHint("Bottom section is scrollable.")
 
                 ZStack {
                     if viewModel.checkedInProfiles.isEmpty {
@@ -71,11 +81,15 @@ struct LocationDetailView: View {
                             .padding(.top, 30)
                     } else {
                         ScrollView {
-                            LazyVGrid(columns: viewModel.gridItems) {
+                            LazyVGrid(columns: determineColumns(for: sizeCategory)) {
                                 ForEach(viewModel.checkedInProfiles) { profile in
                                     FirstNameAvatarView(profile: profile)
+                                        .accessibilityElement(children: .ignore)
+                                        .accessibilityAddTraits(.isButton)
+                                        .accessibilityHint("Shows \(profile.firstName) profile pop up.")
+                                        .accessibilityLabel("\(profile.firstName) \(profile.lastName)")
                                         .onTapGesture {
-                                            viewModel.isShowingProfileModal = true
+                                            viewModel.show(profile: profile, in: sizeCategory)
                                         }
                                 }
                             }
@@ -89,22 +103,37 @@ struct LocationDetailView: View {
             }
 
             if viewModel.isShowingProfileModal {
-                Color(.systemBackground)
+                Color(.black)
                     .ignoresSafeArea()
                     .opacity(0.9)
 //                    .transition(.opacity)
                     .transition(AnyTransition.opacity.animation(.easeOut(duration: 0.35)))
                     .zIndex(1)
+                    .accessibilityHidden(true)
 
-                ProfileModalView(isShowingProfileModal: $viewModel.isShowingProfileModal, profile: DDGProfile(record: MockData.profile))
-                    .transition(.opacity.combined(with: .slide))
-                    .animation(.easeInOut)
-                    .zIndex(2)
+                if let selectedProfile = viewModel.selectedProfile {
+                    ProfileModalView(isShowingProfileModal: $viewModel.isShowingProfileModal, profile: selectedProfile)
+                        .accessibilityAddTraits(.isModal)
+                        .transition(.opacity.combined(with: .slide))
+                        .animation(.easeInOut)
+                        .zIndex(2)
+                }
             }
         }
         .onAppear {
             viewModel.getCheckedInProfiles()
             viewModel.getCheckedInStatus()
+        }
+        .sheet(isPresented: $viewModel.isShowingProfileSheet) {
+            if let selectedProfile = viewModel.selectedProfile {
+                NavigationView {
+                    ProfileSheetView(profile: selectedProfile)
+                        .toolbar {
+                            Button("Dismiss") { viewModel.isShowingProfileSheet = false }
+                        }
+                }
+                .accentColor(.brandPrimary)
+            }
         }
         .alert(item: $viewModel.alertItem) { alertItem in
             Alert(title: alertItem.title, message: alertItem.message, dismissButton: alertItem.dismissButton)
@@ -116,8 +145,10 @@ struct LocationDetailView: View {
 
 #Preview {
     NavigationView {
-        LocationDetailView(viewModel: LocationDetailViewModel(location: DDGLocation(record: MockData.location)))
+        LocationDetailView(viewModel: LocationDetailViewModel(location: DDGLocation(record: MockData.chipotle)))
+            .embedInScrollView()
     }
+    .environment(\.sizeCategory, .accessibilityExtraExtraExtraLarge)
 }
 
 struct LocationActionButton: View {
@@ -140,11 +171,15 @@ struct LocationActionButton: View {
 }
 
 struct FirstNameAvatarView: View {
+    @Environment(\.sizeCategory) var sizeCategory
     var profile: DDGProfile
 
     var body: some View {
         VStack {
-            AvatarView(image: profile.avatarImage, size: 64)
+            AvatarView(
+                image: profile.avatarImage,
+                size: sizeCategory >= .accessibilityMedium ? 100 : 64
+            )
             Text(profile.firstName)
                 .bold()
                 .lineLimit(1)
@@ -161,6 +196,7 @@ struct BannerImageView: View {
             .resizable()
             .scaledToFill()
             .frame(height: 120)
+            .accessibilityHidden(true)
     }
 }
 
@@ -179,9 +215,8 @@ struct DescriptionView: View {
 
     var body: some View {
         Text(text)
-            .lineLimit(3)
             .minimumScaleFactor(0.75)
-            .frame(height: 70)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal)
     }
 }

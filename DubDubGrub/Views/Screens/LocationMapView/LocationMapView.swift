@@ -11,12 +11,14 @@ import SwiftUI
 struct LocationMapView: View {
     @EnvironmentObject private var locationManager: LocationManager
     @StateObject var viewModel = LocationMapViewModel()
+    @Environment(\.sizeCategory) var sizeCategory
 
     var body: some View {
         ZStack {
             Map(coordinateRegion: $viewModel.region, showsUserLocation: true, annotationItems: locationManager.locations) { location in
                 MapAnnotation(coordinate: location.location.coordinate, anchorPoint: CGPoint(x: 0.5, y: 1)) {
                     DDGAnnotation(location: location, number: viewModel.checkedInProfiles[location.id] ?? 0)
+                        .accessibilityLabel(viewModel.createVoiceOverSummary(for: location))
                         .onTapGesture {
                             locationManager.selectedLocation = location
                             viewModel.isShowingDetailView = true
@@ -29,13 +31,14 @@ struct LocationMapView: View {
             VStack {
                 LogoView(frameWidth: 125)
                     .shadow(radius: 10)
+                    .accessibilityHidden(true)
                 Spacer()
             }
         }
         .sheet(isPresented: $viewModel.isShowingDetailView) {
             if let selectedLocation = locationManager.selectedLocation {
                 NavigationView {
-                    LocationDetailView(viewModel: LocationDetailViewModel(location: selectedLocation))
+                    createLocationDetailView(for: selectedLocation, in: sizeCategory)
                         .toolbar {
                             Button("Dismiss") { viewModel.isShowingDetailView = false }
                         }

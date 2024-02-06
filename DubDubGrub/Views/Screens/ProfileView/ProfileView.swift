@@ -22,6 +22,10 @@ struct ProfileView: View {
                             AvatarView(image: viewModel.avatar, size: 84)
                             EditImageView()
                         }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityLabel("Profile photo.")
+                        .accessibilityHint("Opens the iPhone's photo picker.")
                         .padding(.leading, 12)
                         .onTapGesture { viewModel.isShowingPhotoPicker = true }
 
@@ -37,12 +41,14 @@ struct ProfileView: View {
 
                 HStack {
                     CharactersRemainView(currentCount: viewModel.bio.count)
+                        .accessibilityAddTraits(.isHeader)
 
                     Spacer()
 
                     if viewModel.isCheckedIn {
                         Button {
                             viewModel.checkOut()
+                            playHaptic()
                         } label: {
                             Label("Check Out", systemImage: "mappin.and.ellipse")
                                 .font(.system(size: 12, weight: .semibold))
@@ -52,6 +58,7 @@ struct ProfileView: View {
                                 .background(Color.pink)
                                 .cornerRadius(8)
                         }
+                        .accessibilityLabel("Check out of current location.")
                     }
                 }
 
@@ -61,6 +68,8 @@ struct ProfileView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.secondary, lineWidth: 1)
                     )
+                    .accessibilityLabel("Bio, \(viewModel.bio)")
+                    .accessibilityHint("This TextField has a 100 characters maximum.")
 
                 Spacer()
 
@@ -76,6 +85,7 @@ struct ProfileView: View {
         }
         .padding(.horizontal)
         .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(DeviceTypes.isiPhone8Standard ? .inline : .automatic)
         .toolbar {
             Button {
                 dismissKeyboard()
