@@ -14,7 +14,7 @@ struct LocationMapView: View {
     @Environment(\.sizeCategory) var sizeCategory
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Map(coordinateRegion: $viewModel.region, showsUserLocation: true, annotationItems: locationManager.locations) { location in
                 MapAnnotation(coordinate: location.location.coordinate, anchorPoint: CGPoint(x: 0.5, y: 1)) {
                     DDGAnnotation(location: location, number: viewModel.checkedInProfiles[location.id] ?? 0)
@@ -28,17 +28,14 @@ struct LocationMapView: View {
             .accentColor(.pink)
             .ignoresSafeArea()
 
-            VStack {
-                LogoView(frameWidth: 125)
-                    .shadow(radius: 10)
-                    .accessibilityHidden(true)
-                Spacer()
-            }
+            LogoView(frameWidth: 125)
+                .shadow(radius: 10)
+                .accessibilityHidden(true)
         }
         .sheet(isPresented: $viewModel.isShowingDetailView) {
             if let selectedLocation = locationManager.selectedLocation {
                 NavigationView {
-                    createLocationDetailView(for: selectedLocation, in: sizeCategory)
+                    viewModel.createLocationDetailView(for: selectedLocation, in: sizeCategory)
                         .toolbar {
                             Button("Dismiss") { viewModel.isShowingDetailView = false }
                         }
@@ -49,9 +46,7 @@ struct LocationMapView: View {
                 EmptyView()
             }
         }
-        .alert(item: $viewModel.alertItem) { alertItem in
-            Alert(title: alertItem.title, message: alertItem.message, dismissButton: alertItem.dismissButton)
-        }
+        .alert(item: $viewModel.alertItem) { $0.alert }
         .onAppear {
             if locationManager.locations.isEmpty { viewModel.getLocations(for: locationManager) }
             viewModel.getCheckedInCounts()

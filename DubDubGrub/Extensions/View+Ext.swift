@@ -12,11 +12,6 @@ extension View {
         modifier(ProfileNameText())
     }
 
-    func playHaptic() {
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
-    }
-
     func embedInScrollView() -> some View {
         GeometryReader { geometry in
             ScrollView {
@@ -32,13 +27,5 @@ extension View {
     func determineColumns(for sizeCategory: ContentSizeCategory) -> [GridItem] {
         let numberOfColumns = sizeCategory >= .accessibilityMedium ? 1 : 3
         return Array(repeating: GridItem(.flexible()), count: numberOfColumns)
-    }
-
-    @ViewBuilder func createLocationDetailView(for location: DDGLocation, in sizeCategory: ContentSizeCategory) -> some View {
-        if sizeCategory >= .accessibilityMedium {
-            LocationDetailView(viewModel: LocationDetailViewModel(location: location)).embedInScrollView()
-        } else {
-            LocationDetailView(viewModel: LocationDetailViewModel(location: location))
-        }
     }
 }

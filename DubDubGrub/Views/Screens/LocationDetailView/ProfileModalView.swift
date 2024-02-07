@@ -31,9 +31,10 @@ struct ProfileModalView: View {
                 Text(profile.bio)
                     .lineLimit(3)
                     .minimumScaleFactor(0.75)
-                    .padding()
+                    .padding(.vertical)
                     .accessibilityLabel("Bio, \(profile.bio)")
             }
+            .padding()
             .frame(width: 300, height: 230)
             .background(Color(.secondarySystemBackground))
             .cornerRadius(16)
@@ -50,6 +51,10 @@ struct ProfileModalView: View {
                 .offset(y: -120)
                 .accessibilityHidden(true)
         }
+        .accessibilityAddTraits(.isModal)
+        .transition(.opacity.combined(with: .slide))
+        .animation(.easeInOut)
+        .zIndex(2)
     }
 }
 

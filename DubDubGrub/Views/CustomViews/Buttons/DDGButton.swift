@@ -9,13 +9,14 @@ import SwiftUI
 
 struct DDGButton: View {
     var title: String
+    var color: Color = .brandPrimary
 
     var body: some View {
         Text(title)
             .bold()
             .frame(width: 280, height: 44)
             .foregroundColor(.white)
-            .background(Color.brandPrimary)
+            .background(color)
             .cornerRadius(8)
     }
 }

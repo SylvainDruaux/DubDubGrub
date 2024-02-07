@@ -12,6 +12,10 @@ struct AlertItem: Identifiable {
     let title: Text
     let message: Text
     let dismissButton: Alert.Button
+
+    var alert: Alert {
+        Alert(title: title, message: message, dismissButton: dismissButton)
+    }
 }
 
 enum AlertContext {
@@ -46,6 +50,26 @@ enum AlertContext {
         message: Text("""
         Your phone's location services are disabled.
         To change that, go to your phone's Settings > Privacy > Location Services
+        """),
+        dismissButton: .default(Text("Ok"))
+    )
+
+    static let checkedInCount = AlertItem(
+        title: Text("Server Error"),
+        message: Text("""
+        Unable to get the number of people checked into each loaction.
+        Please check your internet connection and try again.
+        """),
+        dismissButton: .default(Text("Ok"))
+    )
+
+    // MARK: - LocationListView Errors
+
+    static let unableToGetAllCheckedInProfiles = AlertItem(
+        title: Text("Unable to Get Profiles"),
+        message: Text("""
+        Unable to retrieve checked in profiles to all locations.
+        Please try again.
         """),
         dismissButton: .default(Text("Ok"))
     )

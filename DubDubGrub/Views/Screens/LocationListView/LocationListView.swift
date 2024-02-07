@@ -16,7 +16,7 @@ struct LocationListView: View {
         NavigationView {
             List {
                 ForEach(locationManager.locations) { location in
-                    NavigationLink(destination: createLocationDetailView(for: location, in: sizeCategory)) {
+                    NavigationLink(destination: viewModel.createLocationDetailView(for: location, in: sizeCategory)) {
                         LocationCell(
                             location: location,
                             profiles: viewModel.checkedInProfiles[location.id, default: []]
@@ -26,8 +26,9 @@ struct LocationListView: View {
                     }
                 }
             }
-            .onAppear { viewModel.getCheckedInProfilesDictionary() }
             .navigationTitle("Grub Spots")
+            .onAppear { viewModel.getCheckedInProfilesDictionary() }
+            .alert(item: $viewModel.alertItem) { $0.alert }
         }
     }
 }

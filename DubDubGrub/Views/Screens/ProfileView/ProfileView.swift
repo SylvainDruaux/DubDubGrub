@@ -14,30 +14,20 @@ struct ProfileView: View {
     var body: some View {
         ZStack {
             VStack {
-                ZStack {
-                    NameBackgroundView()
-
-                    HStack(spacing: 16) {
-                        ZStack {
-                            AvatarView(image: viewModel.avatar, size: 84)
-                            EditImageView()
-                        }
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityAddTraits(.isButton)
-                        .accessibilityLabel("Profile photo.")
-                        .accessibilityHint("Opens the iPhone's photo picker.")
-                        .padding(.leading, 12)
+                HStack(spacing: 16) {
+                    ProfileImageView(image: viewModel.avatar)
                         .onTapGesture { viewModel.isShowingPhotoPicker = true }
 
-                        VStack(spacing: 1) {
-                            TextField("First Name", text: $viewModel.firstName).profileNameStyle()
-                            TextField("Last Name", text: $viewModel.lastName).profileNameStyle()
-                            TextField("Company Name", text: $viewModel.companyName).font(.subheadline)
-                        }
-                        .padding(.trailing, 16)
+                    VStack(spacing: 1) {
+                        TextField("First Name", text: $viewModel.firstName).profileNameStyle()
+                        TextField("Last Name", text: $viewModel.lastName).profileNameStyle()
+                        TextField("Company Name", text: $viewModel.companyName).font(.subheadline)
                     }
-                    .padding()
+                    .padding(.trailing, 16)
                 }
+                .padding(.vertical)
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(12)
 
                 HStack {
                     CharactersRemainView(currentCount: viewModel.bio.count)
@@ -48,35 +38,23 @@ struct ProfileView: View {
                     if viewModel.isCheckedIn {
                         Button {
                             viewModel.checkOut()
-                            playHaptic()
                         } label: {
-                            Label("Check Out", systemImage: "mappin.and.ellipse")
-                                .font(.system(size: 12, weight: .semibold))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .foregroundColor(.white)
-                                .background(Color.pink)
-                                .cornerRadius(8)
+                            CheckOutButton()
                         }
                         .accessibilityLabel("Check out of current location.")
+                        .disabled(viewModel.isLoading)
                     }
                 }
 
-                TextEditor(text: $viewModel.bio)
-                    .frame(height: 100)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.secondary, lineWidth: 1)
-                    )
+                BioTextEditor(text: $viewModel.bio)
                     .accessibilityLabel("Bio, \(viewModel.bio)")
-                    .accessibilityHint("This TextField has a 100 characters maximum.")
 
                 Spacer()
 
                 Button {
-                    viewModel.profileContext == .create ? viewModel.createProfile() : viewModel.updateProfile()
+                    viewModel.buttonAction
                 } label: {
-                    DDGButton(title: viewModel.profileContext == .create ? "Create Profile" : "Update Profile")
+                    DDGButton(title: viewModel.buttonTitle)
                 }
                 .padding(.bottom)
             }
@@ -97,12 +75,8 @@ struct ProfileView: View {
             viewModel.getProfile()
             viewModel.getCheckedInStatus()
         }
-        .alert(item: $viewModel.alertItem) { alertItem in
-            Alert(title: alertItem.title, message: alertItem.message, dismissButton: alertItem.dismissButton)
-        }
-        .sheet(isPresented: $viewModel.isShowingPhotoPicker) {
-            PhotoPicker(image: $viewModel.avatar)
-        }
+        .alert(item: $viewModel.alertItem) { $0.alert }
+        .sheet(isPresented: $viewModel.isShowingPhotoPicker) { PhotoPicker(image: $viewModel.avatar) }
         .accentColor(.brandPrimary)
     }
 }
@@ -113,7 +87,7 @@ struct ProfileView: View {
     }
 }
 
-struct NameBackgroundView: View {
+private struct NameBackgroundView: View {
     var body: some View {
         Color(.secondarySystemBackground)
             .frame(height: 130)
@@ -121,18 +95,29 @@ struct NameBackgroundView: View {
     }
 }
 
-struct EditImageView: View {
+private struct ProfileImageView: View {
+    var image: UIImage
+
     var body: some View {
-        Image(systemName: "square.and.pencil")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 14)
-            .foregroundColor(.white)
-            .offset(y: 30)
+        ZStack {
+            AvatarView(image: image, size: 84)
+
+            Image(systemName: "square.and.pencil")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 14)
+                .foregroundColor(.white)
+                .offset(y: 30)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("Profile photo.")
+        .accessibilityHint("Opens the iPhone's photo picker.")
+        .padding(.leading, 12)
     }
 }
 
-struct CharactersRemainView: View {
+private struct CharactersRemainView: View {
     var currentCount: Int
 
     var body: some View {
@@ -146,5 +131,31 @@ struct CharactersRemainView: View {
         }
         .font(.callout)
         .foregroundColor(.secondary)
+    }
+}
+
+struct CheckOutButton: View {
+    var body: some View {
+        Label("Check Out", systemImage: "mappin.and.ellipse")
+            .font(.system(size: 12, weight: .semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .foregroundColor(.white)
+            .background(Color.pink)
+            .cornerRadius(8)
+    }
+}
+
+struct BioTextEditor: View {
+    var text: Binding<String>
+
+    var body: some View {
+        TextEditor(text: text)
+            .frame(height: 100)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.secondary, lineWidth: 1)
+            )
+            .accessibilityHint("This TextField has a 100 characters maximum.")
     }
 }

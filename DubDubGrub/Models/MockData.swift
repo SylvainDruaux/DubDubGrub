@@ -22,10 +22,10 @@ enum MockData {
 
     static var profile: CKRecord {
         let record = CKRecord(recordType: RecordType.profile)
-        record[DDGProfile.kFirstName] = "Sarah"
-        record[DDGProfile.kLastName] = "Connor"
-        record[DDGProfile.kCompanyName] = "Skynet"
-        record[DDGProfile.kBio] = "I betrayed them all and here is my army of Terminators. You can run and hide, they will find you anyway."
+        record[DDGProfile.kFirstName] = "SuperLongFirstName"
+        record[DDGProfile.kLastName] = "SuperLongLastNameJunior"
+        record[DDGProfile.kCompanyName] = "Super long Company Name Incorporated"
+        record[DDGProfile.kBio] = "This is my bio. I hope it's not too long; I can't check the character count."
 
         return record
     }
