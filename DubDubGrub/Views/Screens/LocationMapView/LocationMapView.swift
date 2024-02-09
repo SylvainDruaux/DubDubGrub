@@ -35,7 +35,7 @@ struct LocationMapView: View {
         }
         .sheet(isPresented: $viewModel.isShowingDetailView) {
             if let selectedLocation = locationManager.selectedLocation {
-                NavigationView {
+                NavigationStack {
                     viewModel.createLocationDetailView(for: selectedLocation, in: dynamicTypeSize)
                         .toolbar {
                             Button("Dismiss") { viewModel.isShowingDetailView = false }

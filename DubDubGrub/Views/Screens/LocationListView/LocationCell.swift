@@ -70,7 +70,7 @@ private struct AdditionalProfilesView: View {
             .font(.system(size: 14, weight: .semibold))
             .frame(width: 35, height: 35)
             .foregroundColor(.white)
-            .background(Color.brandPrimary)
+            .background(.brandPrimary)
             .clipShape(.circle)
     }
 }

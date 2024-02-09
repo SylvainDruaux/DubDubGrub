@@ -99,7 +99,7 @@ struct ProfileView: View {
 }
 
 #Preview {
-    NavigationView {
+    NavigationStack {
         ProfileView()
     }
 }
@@ -158,7 +158,7 @@ struct CheckOutButton: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .foregroundColor(.white)
-            .background(Color.pink)
+            .background(.pink)
             .cornerRadius(8)
     }
 }
@@ -167,12 +167,9 @@ struct BioTextEditor: View {
     var text: Binding<String>
 
     var body: some View {
-        TextEditor(text: text)
-            .frame(height: 100)
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.secondary, lineWidth: 1)
-            }
+        TextField("Enter your bio", text: text, axis: .vertical)
+            .textFieldStyle(.roundedBorder)
+            .lineLimit(4...6)
             .accessibilityHint("This TextField has a 100 characters maximum.")
     }
 }

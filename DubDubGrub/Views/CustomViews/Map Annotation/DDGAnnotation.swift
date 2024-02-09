@@ -15,8 +15,8 @@ struct DDGAnnotation: View {
         VStack {
             ZStack {
                 MapBalloon()
+                    .fill(.brandPrimary.gradient)
                     .frame(width: 100, height: 70)
-                    .foregroundColor(.brandPrimary)
 
                 Image(uiImage: location.squareImage)
                     .resizable()
@@ -28,7 +28,7 @@ struct DDGAnnotation: View {
                     Text("\(min(number, 99))")
                         .font(.system(size: 11, weight: .bold))
                         .frame(width: 26, height: 18)
-                        .background(Color.pink)
+                        .background(.pink)
                         .foregroundColor(.white)
                         .clipShape(.capsule)
                         .offset(x: 20, y: -28)
