@@ -10,6 +10,15 @@ import SwiftUI
 struct AppTabView: View {
     @StateObject private var viewModel = AppTabViewModel()
 
+    init() {
+        let tabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.configureWithOpaqueBackground()
+
+        if #available(iOS 15.0, *) {
+            UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        }
+    }
+
     var body: some View {
         TabView {
             LocationMapView()
@@ -23,12 +32,11 @@ struct AppTabView: View {
             }
             .tabItem { Label("Profile", systemImage: "person") }
         }
-        .onAppear {
-            CloudKitManager.shared.getUserRecord()
-            viewModel.runStartupChecks()
+        .task {
+            try? await CloudKitManager.shared.getUserRecord()
+            viewModel.checkIfHasSeenOnboard()
         }
-        .accentColor(.brandPrimary)
-        .sheet(isPresented: $viewModel.isShowingOnboardView, onDismiss: viewModel.checkIfLocationServicesEnabled) {
+        .sheet(isPresented: $viewModel.isShowingOnboardView) {
             OnboardView()
         }
     }

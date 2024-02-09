@@ -41,4 +41,5 @@ struct ProfileSheetView: View {
 
 #Preview {
     ProfileSheetView(profile: DDGProfile(record: MockData.profile))
+        .environment(\.dynamicTypeSize, .accessibility5)
 }

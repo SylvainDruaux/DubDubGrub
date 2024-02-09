@@ -10,20 +10,15 @@ import Foundation
 import SwiftUI
 
 extension LocationListView {
-    final class LocationListViewModel: ObservableObject {
+    @MainActor final class LocationListViewModel: ObservableObject {
         @Published var checkedInProfiles: [CKRecord.ID: [DDGProfile]] = [:]
         @Published var alertItem: AlertItem?
 
-        func getCheckedInProfilesDictionary() {
-            CloudKitManager.shared.getCheckedInProfilesDictionary { result in
-                DispatchQueue.main.async { [self] in
-                    switch result {
-                    case .success(let checkedInProfiles):
-                        self.checkedInProfiles = checkedInProfiles
-                    case .failure:
-                        alertItem = AlertContext.unableToGetAllCheckedInProfiles
-                    }
-                }
+        func getCheckedInProfilesDictionary() async {
+            do {
+                checkedInProfiles = try await CloudKitManager.shared.getCheckedInProfilesDictionary()
+            } catch {
+                alertItem = AlertContext.unableToGetAllCheckedInProfiles
             }
         }
 
@@ -34,8 +29,8 @@ extension LocationListView {
             return "\(location.name) \(count) \(personPlurality) checked in."
         }
 
-        @ViewBuilder func createLocationDetailView(for location: DDGLocation, in sizeCategory: ContentSizeCategory) -> some View {
-            if sizeCategory >= .accessibilityMedium {
+        @ViewBuilder func createLocationDetailView(for location: DDGLocation, in dynamicTypeSize: DynamicTypeSize) -> some View {
+            if dynamicTypeSize >= .accessibility3 {
                 LocationDetailView(viewModel: LocationDetailViewModel(location: location)).embedInScrollView()
             } else {
                 LocationDetailView(viewModel: LocationDetailViewModel(location: location))

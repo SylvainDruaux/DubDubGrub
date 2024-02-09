@@ -12,7 +12,7 @@ enum ProfileContext {
 }
 
 extension ProfileView {
-    final class ProfileViewModel: ObservableObject {
+    @MainActor final class ProfileViewModel: ObservableObject {
         @Published var firstName = ""
         @Published var lastName = ""
         @Published var companyName = ""
@@ -45,18 +45,16 @@ extension ProfileView {
         func getCheckedInStatus() {
             guard let profileRecordID = CloudKitManager.shared.profileRecordID else { return }
 
-            CloudKitManager.shared.fetchRecord(with: profileRecordID) { [self] result in
-                DispatchQueue.main.async { [self] in
-                    switch result {
-                    case .success(let record):
-                        if record["isCheckedIn"] as? CKRecord.Reference != nil {
-                            isCheckedIn = true
-                        } else {
-                            isCheckedIn = false
-                        }
-                    case .failure:
-                        break
+            Task {
+                do {
+                    let record = try await CloudKitManager.shared.fetchRecord(with: profileRecordID)
+                    if record[DDGProfile.kIsCheckedIn] as? CKRecord.Reference != nil {
+                        isCheckedIn = true
+                    } else {
+                        isCheckedIn = false
                     }
+                } catch {
+                    print("Unable to get checked in status")
                 }
             }
         }
@@ -68,27 +66,20 @@ extension ProfileView {
             }
 
             showLoadingView()
-            CloudKitManager.shared.fetchRecord(with: profileID) { result in
-                switch result {
-                case .success(let record):
+
+            Task {
+                do {
+                    let record = try await CloudKitManager.shared.fetchRecord(with: profileID)
                     record[DDGProfile.kIsCheckedIn] = nil
                     record[DDGProfile.kIsCheckedInNilCheck] = nil
 
-                    CloudKitManager.shared.save(record: record) { [self] result in
-                        hideLoadingView()
-                        DispatchQueue.main.async { [self] in
-                            switch result {
-                            case .success:
-                                HapticManager.playSuccess()
-                                isCheckedIn = false
-                            case .failure:
-                                alertItem = AlertContext.unableToCheckInOrOut
-                            }
-                        }
-                    }
-                case .failure:
-                    self.hideLoadingView()
-                    DispatchQueue.main.async { self.alertItem = AlertContext.unableToCheckInOrOut }
+                    _ = try await CloudKitManager.shared.save(record: record)
+                    HapticManager.playSuccess()
+                    isCheckedIn = false
+                    hideLoadingView()
+                } catch {
+                    hideLoadingView()
+                    alertItem = AlertContext.unableToCheckInOrOut
                 }
             }
         }
@@ -108,18 +99,16 @@ extension ProfileView {
             userRecord["userProfile"] = CKRecord.Reference(recordID: profileRecord.recordID, action: .none)
 
             showLoadingView()
-            CloudKitManager.shared.batchSave(records: [userRecord, profileRecord]) { result in
-                DispatchQueue.main.async { [self] in
+            Task {
+                do {
+                    let records = try await CloudKitManager.shared.batchSave(records: [userRecord, profileRecord])
+                    existingProfileRecord = records.first { $0.recordType == RecordType.profile }
+                    CloudKitManager.shared.profileRecordID = existingProfileRecord?.recordID
                     hideLoadingView()
-
-                    switch result {
-                    case .success(let records):
-                        existingProfileRecord = records.first { $0.recordType == RecordType.profile }
-                        CloudKitManager.shared.profileRecordID = existingProfileRecord?.recordID
-                        alertItem = AlertContext.createProfileSuccess
-                    case .failure:
-                        alertItem = AlertContext.createProfileFailure
-                    }
+                    alertItem = AlertContext.createProfileSuccess
+                } catch {
+                    hideLoadingView()
+                    alertItem = AlertContext.createProfileFailure
                 }
             }
         }
@@ -131,27 +120,26 @@ extension ProfileView {
             }
 
             guard let profileReference = userRecord["userProfile"] as? CKRecord.Reference else { return }
-
             let profileRecordID = profileReference.recordID
 
             showLoadingView()
-            CloudKitManager.shared.fetchRecord(with: profileRecordID) { result in
-                DispatchQueue.main.async { [self] in
+
+            Task {
+                do {
+                    let record = try await CloudKitManager.shared.fetchRecord(with: profileRecordID)
+                    existingProfileRecord = record
+
+                    let profile = DDGProfile(record: record)
+                    firstName = profile.firstName
+                    lastName = profile.lastName
+                    companyName = profile.companyName
+                    bio = profile.bio
+                    avatar = profile.avatarImage
+
                     hideLoadingView()
-                    switch result {
-                    case .success(let record):
-                        existingProfileRecord = record
-
-                        let profile = DDGProfile(record: record)
-                        firstName = profile.firstName
-                        lastName = profile.lastName
-                        companyName = profile.companyName
-                        bio = profile.bio
-                        avatar = profile.avatarImage
-
-                    case .failure:
-                        alertItem = AlertContext.unableToGetProfile
-                    }
+                } catch {
+                    hideLoadingView()
+                    alertItem = AlertContext.unableToGetProfile
                 }
             }
         }
@@ -174,15 +162,15 @@ extension ProfileView {
             profileRecord[DDGProfile.kAvatar] = avatar.convertToCKAsset()
 
             showLoadingView()
-            CloudKitManager.shared.save(record: profileRecord) { result in
-                DispatchQueue.main.async { [self] in
+
+            Task {
+                do {
+                    _ = try await CloudKitManager.shared.save(record: profileRecord)
                     hideLoadingView()
-                    switch result {
-                    case .success:
-                        alertItem = AlertContext.updateProfileSuccess
-                    case .failure:
-                        alertItem = AlertContext.updateProfileFailure
-                    }
+                    alertItem = AlertContext.updateProfileSuccess
+                } catch {
+                    hideLoadingView()
+                    alertItem = AlertContext.updateProfileFailure
                 }
             }
         }

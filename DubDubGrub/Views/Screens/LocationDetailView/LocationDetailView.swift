@@ -29,7 +29,7 @@ struct LocationDetailView: View {
                 }
             }
         }
-        .onAppear {
+        .task {
             viewModel.getCheckedInProfiles()
             viewModel.getCheckedInStatus()
         }
@@ -41,7 +41,6 @@ struct LocationDetailView: View {
                             Button("Dismiss") { viewModel.isShowingProfileSheet = false }
                         }
                 }
-                .accentColor(.brandPrimary)
             }
         }
         .alert(item: $viewModel.alertItem) { $0.alert }
@@ -63,27 +62,27 @@ private struct LocationActionButton: View {
     var body: some View {
         ZStack {
             Circle()
-                .frame(width: 60)
+                .frame(width: 60, height: 60)
                 .foregroundColor(color)
 
             Image(systemName: image)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 22)
+                .frame(width: 22, height: 22)
                 .foregroundColor(.white)
         }
     }
 }
 
 private struct FirstNameAvatarView: View {
-    @Environment(\.sizeCategory) var sizeCategory
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     var profile: DDGProfile
 
     var body: some View {
         VStack {
             AvatarView(
                 image: profile.avatarImage,
-                size: sizeCategory >= .accessibilityMedium ? 100 : 64
+                size: dynamicTypeSize >= .accessibility3 ? 100 : 64
             )
             Text(profile.firstName)
                 .bold()
@@ -215,7 +214,7 @@ private struct FullScreenBlackTransparencyView: View {
 }
 
 private struct AvatarGridView: View {
-    @Environment(\.sizeCategory) var sizeCategory
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     @ObservedObject var viewModel: LocationDetailViewModel
 
     var body: some View {
@@ -224,10 +223,12 @@ private struct AvatarGridView: View {
                 GridEmptyStateTextView()
             } else {
                 ScrollView {
-                    LazyVGrid(columns: determineColumns(for: sizeCategory)) {
+                    LazyVGrid(columns: determineColumns(for: dynamicTypeSize)) {
                         ForEach(viewModel.checkedInProfiles) { profile in
                             FirstNameAvatarView(profile: profile)
-                                .onTapGesture { viewModel.show(profile, in: sizeCategory) }
+                                .onTapGesture {
+                                    withAnimation { viewModel.show(profile, in: dynamicTypeSize) }
+                                }
                         }
                     }
                 }

@@ -20,12 +20,8 @@ extension View {
         }
     }
 
-    func dismissKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-
-    func determineColumns(for sizeCategory: ContentSizeCategory) -> [GridItem] {
-        let numberOfColumns = sizeCategory >= .accessibilityMedium ? 1 : 3
+    func determineColumns(for dynamicTypeSize: DynamicTypeSize) -> [GridItem] {
+        let numberOfColumns = dynamicTypeSize >= .accessibility3 ? 1 : 3
         return Array(repeating: GridItem(.flexible()), count: numberOfColumns)
     }
 }

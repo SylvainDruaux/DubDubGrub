@@ -10,6 +10,11 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
+    @FocusState private var focusedTextField: ProfileTextField?
+
+    enum ProfileTextField {
+        case firstName, lastName, companyName, bio
+    }
 
     var body: some View {
         ZStack {
@@ -19,9 +24,22 @@ struct ProfileView: View {
                         .onTapGesture { viewModel.isShowingPhotoPicker = true }
 
                     VStack(spacing: 1) {
-                        TextField("First Name", text: $viewModel.firstName).profileNameStyle()
-                        TextField("Last Name", text: $viewModel.lastName).profileNameStyle()
-                        TextField("Company Name", text: $viewModel.companyName).font(.subheadline)
+                        TextField("First Name", text: $viewModel.firstName)
+                            .profileNameStyle()
+                            .focused($focusedTextField, equals: .firstName)
+                            .onSubmit { focusedTextField = .lastName }
+                            .submitLabel(.next)
+
+                        TextField("Last Name", text: $viewModel.lastName)
+                            .profileNameStyle()
+                            .focused($focusedTextField, equals: .lastName)
+                            .onSubmit { focusedTextField = .companyName }
+                            .submitLabel(.next)
+
+                        TextField("Company Name", text: $viewModel.companyName)
+                            .focused($focusedTextField, equals: .companyName)
+                            .onSubmit { focusedTextField = .bio }
+                            .submitLabel(.next)
                     }
                     .padding(.trailing, 16)
                 }
@@ -47,6 +65,7 @@ struct ProfileView: View {
                 }
 
                 BioTextEditor(text: $viewModel.bio)
+                    .focused($focusedTextField, equals: .bio)
                     .accessibilityLabel("Bio, \(viewModel.bio)")
 
                 Spacer()
@@ -58,26 +77,24 @@ struct ProfileView: View {
                 }
                 .padding(.bottom)
             }
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Button("Dismiss") { focusedTextField = nil }
+                }
+            }
 
             if viewModel.isLoading { LoadingView() }
         }
         .padding(.horizontal)
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(DeviceTypes.isiPhone8Standard ? .inline : .automatic)
-        .toolbar {
-            Button {
-                dismissKeyboard()
-            } label: {
-                Image(systemName: "keyboard.chevron.compact.down")
-            }
-        }
-        .onAppear {
+        .ignoresSafeArea(.keyboard)
+        .task {
             viewModel.getProfile()
             viewModel.getCheckedInStatus()
         }
         .alert(item: $viewModel.alertItem) { $0.alert }
         .sheet(isPresented: $viewModel.isShowingPhotoPicker) { PhotoPicker(image: $viewModel.avatar) }
-        .accentColor(.brandPrimary)
     }
 }
 
@@ -105,7 +122,7 @@ private struct ProfileImageView: View {
             Image(systemName: "square.and.pencil")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 14)
+                .frame(width: 14, height: 14)
                 .foregroundColor(.white)
                 .offset(y: 30)
         }
@@ -152,10 +169,10 @@ struct BioTextEditor: View {
     var body: some View {
         TextEditor(text: text)
             .frame(height: 100)
-            .overlay(
+            .overlay {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.secondary, lineWidth: 1)
-            )
+            }
             .accessibilityHint("This TextField has a 100 characters maximum.")
     }
 }

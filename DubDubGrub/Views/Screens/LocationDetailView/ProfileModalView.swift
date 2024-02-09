@@ -38,13 +38,13 @@ struct ProfileModalView: View {
             .frame(width: 300, height: 230)
             .background(Color(.secondarySystemBackground))
             .cornerRadius(16)
-            .overlay(
+            .overlay(alignment: .topTrailing) {
                 Button {
                     withAnimation { isShowingProfileModal = false }
                 } label: {
                     XDismissButton()
-                }, alignment: .topTrailing
-            )
+                }
+            }
 
             AvatarView(image: profile.avatarImage, size: 110)
                 .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 6)
@@ -53,7 +53,6 @@ struct ProfileModalView: View {
         }
         .accessibilityAddTraits(.isModal)
         .transition(.opacity.combined(with: .slide))
-        .animation(.easeInOut)
         .zIndex(2)
     }
 }
